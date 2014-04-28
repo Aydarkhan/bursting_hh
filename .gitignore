@@ -1,0 +1,6 @@
+*.py[cod]
+*.pdf
+
+# Latex
+*.log
+*.aux`
