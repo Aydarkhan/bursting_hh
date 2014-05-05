@@ -69,12 +69,61 @@ def HH_model(tend, I, Params):
     traces['IK'] = StateMonitor(neuron, 'IK', record=True)
     
     # running the simulation
+    defaultclock.dt = 0.05 * ms
     run(tend * ms)
     
     return traces
 
 
+def HH_Step(params, Step_tstart = 30, Duration = 150, I_amp=15, tend=200):
+    
+    """
+run the Hodgkin-Huxley for a step current
 
+Parameters:
+params            Parameters of the neuron model
+tend = 200           ending time (ms)
+Step_tstart = 30     time at which the step current begins (ms)
+Step_tend = 170      time at which the step current ends (ms)
+I_amp = 15           magnitude of the current step (pA)
+    """
+    if tend < Step_tstart + Duration + 30:
+        tend = Step_tstart + Duration + 30
+    
+    # producing step current
+    Step_current = numpy.zeros(tend)
+    for t in range(Step_tstart, Step_tend + 1):
+        Step_current[t] = I_amp*pA
+    
+    # converting to acceptable current for Brian
+    I = TimedArray(Step_current,dt=1*ms)
+    
+    tr = HH_model(tend, I, params)
+    
+    return tr
+
+def detect_spikes(t, v, threshold=20):
+
+    in_spike = False
+    spike_v_interval = []
+    spike_t_interval = []
+    spike_times = []
+
+    for time, voltage in zip(t, v):
+        if  not in_spike and voltage > threshold:
+            in_spike = True
+
+        if in_spike and voltage < threshold:
+            in_spike = False
+            spike_times.append(spike_t_interval[numpy.argmax(spike_v_interval)])
+            spike_v_interval = []
+            spike_t_interval = []
+
+        if in_spike:
+            spike_t_interval.append(time)
+            spike_v_interval.append(voltage)
+
+    return spike_times
 
 def main():
     pass
