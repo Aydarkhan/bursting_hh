@@ -36,9 +36,9 @@ def HH_model(tend, I, Params):
     IK = gK*n**4*(EK-vm) : amp
     dn/dt = -1/tau_n*(n - n_inf) : 1
     dm/dt = -1/tau_m*(m - m_inf) : 1
-    n_inf = 1/(1+e**((vm - theta_n)/sigma_n)) : ms
+    n_inf = 1/(1+e**((vm - theta_n)/sigma_n)) : 1
     tau_n = tau_na*1/cosh((vm - theta_n)/(2 * sigma_n)) : ms
-    m_inf = 1/(1+e**((vm - theta_m)/sigma_m)) : ms
+    m_inf = 1/(1+e**((vm - theta_m)/sigma_m)) : 1
     tau_m = tau_ma*1/cosh((vm - theta_m)/(2 * sigma_m)) : ms
     '''
     
@@ -72,6 +72,7 @@ def HH_model(tend, I, Params):
     defaultclock.dt = 0.05 * ms
     run(tend * ms)
     
+    traces['t'] = traces['v'].times
     return traces
 
 
@@ -92,7 +93,7 @@ I_amp = 15           magnitude of the current step (pA)
     
     # producing step current
     Step_current = numpy.zeros(tend)
-    for t in range(Step_tstart, Step_tend + 1):
+    for t in range(Step_tstart, Step_tstart + Duration + 1):
         Step_current[t] = I_amp*pA
     
     # converting to acceptable current for Brian
