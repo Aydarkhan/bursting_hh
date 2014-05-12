@@ -30,10 +30,10 @@ def HH_model(tend, I, Params):
     # forming HH model with differential equations
     #__membrane_Im = I_e+ gNa*m**3*(1-n)*(ENa-vm) + gl*(El-vm) + gK*n**4*(EK-vm) : amp    
     eqs = '''
-    I_e : amp  
+    I_e : pamp  
     dvm/dt = (I_e+ INa + gl*(El-vm) + IK)/C : volt
-    INa = gNa*m**3*(1-n)*(ENa-vm) : amp
-    IK = gK*n**4*(EK-vm) : amp
+    INa = gNa*m**3*(1-n)*(ENa-vm) : pamp
+    IK = gK*n**4*(EK-vm) : pamp
     dn/dt = -1/tau_n*(n - n_inf) : 1
     dm/dt = -1/tau_m*(m - m_inf) : 1
     n_inf = 1/(1+e**((vm - theta_n)/sigma_n)) : 1
@@ -41,6 +41,7 @@ def HH_model(tend, I, Params):
     m_inf = 1/(1+e**((vm - theta_m)/sigma_m)) : 1
     tau_m = tau_ma*1/cosh((vm - theta_m)/(2 * sigma_m)) : ms
     '''
+    # WHY both n_inf -> 1 and dn/dt -> 1
     
     neuron = NeuronGroup(1, eqs, implicit=True, freeze=True)
     
@@ -48,9 +49,9 @@ def HH_model(tend, I, Params):
     reinit()
     
     # parameter initialization
-    neuron.vm = 0
-    neuron.m = 0.0529324852572
-    neuron.n = 0.317676914061
+    neuron.vm = -70 * mV
+    neuron.m = 0 #0.0529324852572
+    neuron.n = 0 #0.317676914061
     
     # injecting current to the neuron
     neuron.I_e = I
