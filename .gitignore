@@ -4,6 +4,7 @@
 # Latex
 *.log
 *.aux`
+*.swp
 
 # Pictures
 *.eps

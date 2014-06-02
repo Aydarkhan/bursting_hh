@@ -14,7 +14,7 @@ reference_params = {'gNa': 28, 'C': 21, 'ENa': 50, 'EK':-85, 'EL': -65, 'gK': 11
         }
 
 image_dir = 'report/images/'
-rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
+#rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 rc('text', usetex=False)
 
 def main():
@@ -40,15 +40,6 @@ def main():
     xlabel("Injected current, pA")
     legend()
 
-    #subplot(212) 
-    #plot(tr['t']/ms, tr['IKS'][0]/namp, label="KS")
-    #plot(tr['t']/ms, tr['INaP'][0]/namp, label="NaP")
-    #xlim(0, tend)
-    #ylabel(r"I, nA")
-    #xlabel("Time, ms")
-    #title('Currents')
-    #legend()
-
     #close()
 
 def burst_periods(time, vtrace):
@@ -69,5 +60,86 @@ def burst_periods(time, vtrace):
 
     return (bduration, bperiod)
 
+def modes(time, vtrace):
+    """ 
+    0 - silence
+    1 - bursting
+    2 - beating
+    """
+
+    spike_times = m.detect_spikes(time, vtrace, threshold=0)
+    onsets = [0]
+    for i in range(len(spike_times) - 1):
+        if spike_times[i+1] - spike_times[i] > 200:
+            onsets.append(i+1)
+
+    if len(spike_times) < 2: 
+        return (0,0,0)
+
+    while len(onsets) > 1 and onsets[1] - onsets[0] < 10:
+        onsets.pop(0)
+
+    if len(onsets) > 1:
+        bperiod = spike_times[onsets[1]] - spike_times[onsets[0]]
+        bduration = spike_times[onsets[1] - 1] - spike_times[onsets[0]]
+        mode = 1
+    elif len(onsets) == 1:
+        bduration = spike_times[-1] - spike_times[onsets[0]]
+        if bduration > 1500:
+            bduration = mean(spike_times[onsets[0]:])
+            bperiod = 0
+            mode = 2
+        else:
+            bperiod = 10000
+            mode = 1
+    else:
+        mode = 0
+        bperiod = 0
+        bduration = 0
+
+    return (mode, bduration, bperiod)
+
+def main2():
+    tend=11000
+    cur = 1
+    start = 30
+    dur = 10000
+
+    tr = m.HH_Step(reference_params, Step_tstart = start, Duration = dur, I_amp=cur, tend=tend, model=m.HH_model_KS)
+    mode, bduration, bperiod = modes(tr['t']/ms, tr['v'][0]/mV)
+    
+    print "Mode %s, Duration %s, Period %s" % ( mode, bduration, bperiod)
+
+    #figure(1)
+    #plot(curs, bperiods, label="Period")
+    #plot(curs, bdurations, label="Duration")
+    #title('Duration and period of bursting')
+    ##xlim(0, tend)
+    #xlabel("Injected current, pA")
+    #legend()
+
+    figure(2)
+    subplot(211) 
+    plot(tr['t']/ms, tr['v'][0]/mV)
+    #scatter(spike_times, tr['v'][0][map(lambda x: where(tr['t']/ms == x)[0][0], spike_times)]/mV, label="Spikes")
+    title('Membrane potential')
+    xlim(0, tend)
+    ylabel("Voltage, mV")
+    legend()
+
+
+    subplot(212) 
+    plot(tr['t']/ms, tr['IK'][0]/namp, label="K")
+    plot(tr['t']/ms, tr['INa'][0]/namp, label="Na")
+    plot(tr['t']/ms, tr['IKS'][0]/namp, label="KS")
+    plot(tr['t']/ms, tr['INaP'][0]/namp, label="NaP")
+    xlim(0, tend)
+    ylabel(r"I, nA")
+    xlabel("Time, ms")
+    title('Currents')
+    legend()
+
+
+
 #if __name__ == '__main__':
-main()
+main2()
