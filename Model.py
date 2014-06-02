@@ -82,6 +82,8 @@ def HH_model_KS(tend, I, Params):
     traces['I'] = StateMonitor(neuron, 'I_e', record=True)
     traces['m'] = StateMonitor(neuron, 'm', record=True)
     traces['n'] = StateMonitor(neuron, 'n', record=True)
+    traces['k'] = StateMonitor(neuron, 'k', record=True)
+    traces['r'] = StateMonitor(neuron, 'r', record=True)
     traces['tau_n'] = StateMonitor(neuron, 'tau_n', record=True)
     traces['tau_m'] = StateMonitor(neuron, 'tau_m', record=True)
     traces['m_inf'] = StateMonitor(neuron, 'm_inf', record=True)
