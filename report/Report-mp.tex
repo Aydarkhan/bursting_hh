@@ -85,8 +85,69 @@
 \end{center}
 %##################
 %##################
+\section{Introduction}
+To understand a complex neural network, one has to know not only how its
+neurons are connected together, but also how each of them behave.
+This has been the main concern of Hodgkin and Huxley when they created
+their model to describe how a neuron behaves, under different circumstances
+and in terms of ions, currents and voltages.
+
+This model considers the electric behaviour of a neuron as flows of ions
+through a membrane, either through channels or by a pump, the flows being
+derived by the difference in potential. The classic way to represent the
+behaviour of a membrane is therefore by setting that the difference in
+potential is the sum of all flows :
+\begin{align*}\frac{dV}{dt} = [I_{ext}+g_{Na}(E_{Na}-V)+g_K(E_K-V)+\frac{g_l}{C_m}(E_l-V)]\end{align*}
+
+There are several interesting terms in this equation : $g_{Na}(E_{Na}-V)$
+describes how the sodium current is influenced by the difference in
+potential between the interior and the exterior of the neuron, $g_K(E_K-V)$
+does the same with potassium. $\frac{g_l}{C_m}(E_l-V)$ describes the
+leakage of the neuron, and $I_{ext}$ describes one of the values we want
+to play with, which is the current we inject into the neuron so it can
+actually have an interesting reaction, other than equilibrium.
+
+One important concept is the gating variable. To emulate correctly how
+a neuron behaves in terms of ion currents, we need to assess if their
+specific channels are open or not. To model the behaviour of a channel,
+one uses gating variables, which in our model are used as follow :
+$g_K$ depends on $n^4$ and $g_{Na}$ on $m^3(1-n)$. This permits us to
+define an effective conductance of a channel. The variables behave as
+described by the set of equations (2) from the project description.
+
+The goal of this project is of course not only to create an in silico
+implementation of the Hodgkin-Huxley model using Brian, and playing with
+it as such, but throughout the project we also create other classes of
+channels, such that the neurons start undergoing other behaviours, to
+emulate behaviours different classes of neurons actually have in vivo.
 
 \section{HH simulation}
+
+In this section, we test our implementation of the Hudgkin-Huxley model.
+We inject a current of 100 pA into our neuron for 100 ms, as we see in
+the second subplot. By looking at the first subplot, it becomes obvious
+that the current raises the base potential of the neuron from a bit
+more than -70 to a bit more than -50.
+
+By looking at the third subplot, one can observe that this raise in
+base potential affects the gating variables m and n : both react to
+this change, but m reacts much quicker, which has an opening effect
+on the sodium channel, since it is to the power of 3 whereas the closing
+effect of n is to the power of 1 only.
+
+As the sodium channels open more and more, the difference from the
+base potential becomes bigger and bigger, which in turn increases the
+gating variables more and more : the inflow of sodium increases more
+and more, taking a spike-like shape.
+
+But the difference from base potential also starts having a big effect
+on n for the potassium channels, since there it is of power 4 : at
+some point, the potassium channels open, and since the slope of the
+induced current is very steep and negative to the sodium's, the already
+steep increase of voltage becomes countered by a steeper decrease.
+The potential stops increasing abruptly and decreases very quickly.
+This accounts for the spikey behaviour of the potential during action
+potential.
 
 \begin{figure}[H]
     \centering
@@ -95,22 +156,50 @@
     \label{fig:step}
 \end{figure}
 
+This sudden decrease in potential has an effect on the gating variables
+: they decrease abruptly too. Quickly, both inflow of sodium and
+outflow of potassium decrease, which affects m quicker than n as
+we see in the third subplot. This way, the potassium outflow can
+still have an effect on m, but much slower. Finally, the sodium channel
+closes again, followed by the potassium channel, and the voltage
+is back to the input current induced potential.
+
+Figure 2 gives a nice view of the difference in time constant,
+the first subplot indicating to us how much this difference gets
+at the voltages we consider. On the second figure, again, we can
+see the difference of time constant, and how m reacts sooner than
+n. What we also see, is that the increase in m is smaller than
+that of n.
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{tau_inf}
-    \caption{$\tau_\infty$}
+    \caption{Effect of time parameters on m and n}
     \label{fig:tau_inf}
 \end{figure}
 
 \section{Bursting neuron}
 
-In this section we will investigate the bursting behavior.
+In this exercise, we add two persistent channels, one for sodium
+and one for potassium.
 
 \subsection{Persistent sodium channel for repetitive firing}
 
+Our approach for finding a threshold for sustained repetitive
+firing is refinement based : we start by testing if the neuron
+shows sustained repetitive firing for several ascending values.
+Once we hit a value for $\tilde{g}_{NaP}$ for the neuron having
+such a behaviour, we start at that value minus the chosen step,
+but this time with a smaller step. We repeat this until the
+precision seems good enough.
+
+To test if the neuron shows sustained firing, we simply count
+the number of spikes for the whole simulation, and if this number
+is small (less than 10 in our case), we assume that the neuron is
+not undergoing sustained repetitive firing.
+
 We found the threshold value for $\tilde{g}_{NaP}$ when it can evoke bursting 
 with the precision of 0.1 nS. It turned out to be 2.35.
-
 
 The figure \ref{fig:2.1} shows appearance of the bursting behavior evoked by 
 persistent sodium channel $NaP$. The conductance $\tilde{g}_{NaP}$ was
