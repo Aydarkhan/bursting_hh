@@ -31,6 +31,7 @@ def main():
         bduration, bperiod = burst_periods(tr['t']/ms, tr['v'][0]/mV)
         bdurations.append(bduration)
         bperiods.append(bperiod)
+        print bduration
 
     figure(1)
     plot(curs, bperiods, label="Period")
@@ -86,7 +87,8 @@ def modes(time, vtrace):
     elif len(onsets) == 1:
         bduration = spike_times[-1] - spike_times[onsets[0]]
         if bduration > 1500:
-            bduration = mean(spike_times[onsets[0]:])
+            sp_ts = array(spike_times)
+            bduration = mean(sp_ts[onsets[0]+1:] - sp_ts[onsets[0]:-1])
             bperiod = 0
             mode = 2
         else:
@@ -101,7 +103,7 @@ def modes(time, vtrace):
 
 def main2():
     tend=11000
-    cur = 1
+    cur = 80
     start = 30
     dur = 10000
 
@@ -140,20 +142,48 @@ def main2():
     legend()
 
 def main3():
-	tend=11000
-	cur = 1
-	start = 30
-	dur = 10000
-	
-	curs = range(0,80,10)
-	# Workaround to get a range with floats
-	gNaPs = [x * 0.1 for x in range(15,35,5)]
-	for cur in curs:
-		for gNaP in gNaPs:
-			reference_params['gNaP'] = gNaP
-			tr = m.HH_Step(reference_params, Step_tstart = start, Duration = dur, I_amp=cur, tend=tend, model=m.HH_model_KS)
-			mode, bduration, bperiod = modes(tr['t']/ms, tr['v'][0]/mV)
-			print "For cur=%s, gNaP=%s : Mode %s, Duration %s, Period %s" % (cur, gNaP, mode, bduration, bperiod)
+    tend=11000
+    cur = 1
+    start = 30
+    dur = 10000
+    
+    curs = range(0,81,10)
+    # Workaround to get a range with floats
+    gNaPs = [x * 0.1 for x in range(15,36,5)]
+    for cur in curs:
+        for gNaP in gNaPs:
+            reference_params['gNaP'] = gNaP
+            tr = m.HH_Step(reference_params, Step_tstart = start, Duration = dur, I_amp=cur, tend=tend, model=m.HH_model_KS)
+            mode, bduration, bperiod = modes(tr['t']/ms, tr['v'][0]/mV)
+            print "%s %s %s %s" % (cur, gNaP, mode, bduration)
+
+
+def plot3():
+    curs = zeros(9)
+    gNaPs = zeros(5)
+    modes = zeros((9,5))
+    durations = zeros((9,5))
+    with open('ex3.3.data') as f:
+        for line in f:
+            cur, gNaP, mode, duration = map(float, line.split())
+            modes[cur/10, (gNaP - 1.5) / 0.5] = mode
+            durations[cur/10, (gNaP - 1.5) / 0.5] = duration
+
+    figure(1)
+    subplot(1,2,1)
+    imshow(modes, interpolation='none')
+    cbar = colorbar()
+    xticks(range(5), arange(1.5,3.6,0.5))
+    yticks(range(9), range(0,91,10))
+    cbar.set_ticks([0,1,2])
+    cbar.set_ticklabels(['Silence','Bursting','Beating'])
+
+    subplot(1,2,2)
+    imshow(durations)
+    colorbar()
+    xticks(range(5), arange(1.5,3.6,0.5))
+    yticks(range(9), range(0,91,10))
+
 
 #if __name__ == '__main__':
-main3()
+main2()
