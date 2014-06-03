@@ -39,7 +39,7 @@ def main():
                 g_thr_pre = g - step
                 break
 
-    g_thr = 2.0 #2.35 # GOOD THRESHOLD with precision of 0.01
+    g_thr = 3.0 #2.35 # GOOD THRESHOLD with precision of 0.01
     print g_thr
     reference_params['gNaP'] = g_thr
     tr = m.HH_Step(reference_params, Step_tstart = start, Duration = dur, I_amp=cur, tend=tend, model=m.HH_model_NaP)
@@ -97,14 +97,14 @@ def main():
     title('Currents')
     legend()
 
-    #savefig(image_dir + "step_cur.pdf")
+    savefig(image_dir + "ex2.1.pdf")
     #close()
 
 def main2():
     tend=11000
     cur = 40
     start = 30
-    dur = 10000
+    dur =10000
 
     tr = m.HH_Step(reference_params, Step_tstart = start, Duration = dur, I_amp=cur, tend=tend, model=m.HH_model_KS)
     spike_times = m.detect_spikes(tr['t']/ms, tr['v'][0]/mV, threshold=0)
@@ -153,6 +153,8 @@ def main2():
     xlabel("Time, ms")
     title('Currents')
     legend()
+
+    savefig(image_dir + "ex2.2_long.pdf")
 
     figure(3)
     #subplot(413) 

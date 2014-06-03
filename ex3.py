@@ -140,6 +140,7 @@ def main2():
     xlabel("Time, ms")
     title('Currents')
     legend()
+    savefig(image_dir + "ex3.2.pdf")
 
 def main3():
     tend=11000
@@ -163,7 +164,7 @@ def plot3():
     gNaPs = zeros(5)
     modes = zeros((9,5))
     durations = zeros((9,5))
-    with open('ex3.3.data') as f:
+    with open('3.3.new') as f:
         for line in f:
             cur, gNaP, mode, duration = map(float, line.split())
             modes[cur/10, (gNaP - 1.5) / 0.5] = mode
@@ -175,15 +176,29 @@ def plot3():
     cbar = colorbar()
     xticks(range(5), arange(1.5,3.6,0.5))
     yticks(range(9), range(0,91,10))
+    title('Modes')
     cbar.set_ticks([0,1,2])
     cbar.set_ticklabels(['Silence','Bursting','Beating'])
 
+    freqs = zeros((9,5))
+    for i in range(9):
+        for j in range(5):
+            if durations[i,j] != 0:
+                freqs[i,j] = 1/durations[i,j]*1000
+            else:
+                freqs[i,j] = 0
+
     subplot(1,2,2)
-    imshow(durations)
-    colorbar()
+    imshow(freqs, interpolation='none')
+    cbar = colorbar()
     xticks(range(5), arange(1.5,3.6,0.5))
     yticks(range(9), range(0,91,10))
+    title('Frequencies, Hz')
+    #cbar.set_clim([0,50])
+
+    savefig(image_dir + "ex3.3.pdf")
 
 
 #if __name__ == '__main__':
-main3()
+plot3()
+#main2()
