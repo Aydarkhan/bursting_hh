@@ -139,7 +139,21 @@ def main2():
     title('Currents')
     legend()
 
-
+def main3():
+	tend=11000
+	cur = 1
+	start = 30
+	dur = 10000
+	
+	curs = range(0,80,10)
+	# Workaround to get a range with floats
+	gNaPs = [x * 0.1 for x in range(15,35,5)]
+	for cur in curs:
+		for gNaP in gNaPs:
+			reference_params['gNaP'] = gNaP
+			tr = m.HH_Step(reference_params, Step_tstart = start, Duration = dur, I_amp=cur, tend=tend, model=m.HH_model_KS)
+			mode, bduration, bperiod = modes(tr['t']/ms, tr['v'][0]/mV)
+			print "For cur=%s, gNaP=%s : Mode %s, Duration %s, Period %s" % (cur, gNaP, mode, bduration, bperiod)
 
 #if __name__ == '__main__':
-main2()
+main3()
