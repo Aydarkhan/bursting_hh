@@ -50,7 +50,7 @@
 \usepackage{titlesec}
 \titleformat{\section}{\large\bfseries}{Exercise \thesection.}{.35em}{}
 %\renewcommand\thesubsection{(\alph{subsection})}
-\titleformat{\subsection}[runin]{\itshape}{\thesubsection}{.35em}{}
+\titleformat{\subsection}{\itshape}{\thesubsection}{.35em}{}
 
 % Hyper
 %\usepackage[table,usenames,dvipsnames]{xcolor}
@@ -103,18 +103,135 @@
 \end{figure}
 
 \section{Bursting neuron}
+
+In this section we will investigate the bursting behavior.
+
 \subsection{Persistent sodium channel for repetitive firing}
-\subsection{Slow potassium channel for bursting}
-\section{Analysis of bursting and beating behaviors}
-\subsection{Description of repetitive bursting}
+
+We found the threshold value for $\tilde{g}_{NaP}$ when it can evoke bursting 
+with the precision of 0.1 nS. It turned out to be 2.35.
+
+
+The figure \ref{fig:2.1} shows appearance of the bursting behavior evoked by 
+persistent sodium channel $NaP$. The conductance $\tilde{g}_{NaP}$ was
+set to $3.0 nS$ to visualize the typical case. Neuron does not return
+to rest because the channel $NaP$ stays open longer than the usual $Na$ channel
+while the voltage falls down. This sustained current evokes action potential
+again. The reason of that is that conductance of normal $Na$ channel is 
+proportional to cube of gating variable $m$ whereas there is a linear dependence
+between conductance and gating variable $r$ for channel $NaP$.
 
 \begin{figure}[H]
     \centering
-    \includegraphics{bduration_bperiod}
-    \caption{}
+    \includegraphics[width=\textwidth]{ex2_1}
+    \caption{Result of simulation with the persistent sodium channel NaP}
+    \label{fig:2.1}
+\end{figure}
+
+\subsection{Slow potassium channel for bursting}
+
+Further modification of the neuron model introduces slow potassium channel $KS$
+which ends bursting behavior. The figures \ref{fig:short} and \ref{fig:long}
+demonstrates the simulations with channel $KS$ for short (20 ms) and long ($10^4$ms) injected
+current pulse of 40pA respectively.
+
+With the short pulse we can observe long bursting period
+which strongly exceeds the pulse duration. Since the voltage stays high during bursting
+conductance of $KS$ channel slowly grows until it becomes high enough to end firing.
+The dynamics of $KS$ conductance is much slower than of the others because of the parameter $\bar{\tau}_k$.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{ex2_2_short}
+    \caption{Result of simulation with the persistent potassium channel KS (short pulse)}
+    \label{fig:short}
+\end{figure}
+
+Long pulse uncovers transient behavior in the beginning though eventually the neuron
+switches to the bursting. We can see how the conductance of $KS$ changes via looking
+at the dynamics of pick currents (during spikes). When it is low, the bursting start
+is caused by the gradual growth of voltage via $NaP$ channel. When the $KS$ conductance
+reaches particular value the bursting end.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{ex2_2_long}
+    \caption{Result of simulation with the persistent potassium channel KS (long pulse)}
+    \label{fig:long}
+\end{figure}
+
+\section{Analysis of bursting and beating behaviors}
+\subsection{Description of repetitive bursting}
+
+To measure the repetitive bursting behavior observed in the previous exercise
+we implemented a function estimating duration of each burst and the period of
+burst repetition. We used a couple of arbitrary but reasonable for this task thresholds.
+First of all we detect all spikes using the previously used function. Then we 
+extract the times of the first spikes in bursting set.
+Bursting set is supposed to be finished if there is no spike during 200 ms after the last one.
+To deal with the transient behavior in the beginning we cut out all found ``bursting'' sets of size
+less than 10 spikes in the beginning. Then the period of the burst is the difference in times
+between the first spikes of neighboring bursts. Duration is the difference in times between the
+first spike of the set and the spike preceding the first spike of the following set.
+If there is only one burst we set the period to 10$s$.
+
+For the simulations in this section we used $\tilde{g}_{NaP} = 3.2nS$, pulse
+duration of 10$s$ and varied injected current from 5 to 45 pA.
+We can see how the period and duration of bursting sets changes with 
+the current on the figure \ref{fig:bdur_bper}.
+
+From the figure We can conclude that the duration does not depend much on the
+injected current while the period becomes shorter.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{bduration_bperiod}
+    \caption{Duration and period of the bursting for different injected currents}
     \label{fig:bdur_bper}
 \end{figure}
 
 \subsection{Bursting and beating modes}
+
+This section is dedicated to beating behavior which
+can be observed for high injected current. The figure \ref{fig:beat} was obtained
+with $\tilde{g}_{NaP} = 3.2nS, I_{ext} = 80pA$, and the pulse duration of 10$s$.
+This new beating behavior occurs probably because the external current is so
+large that $KS$ channel cannot block the positive current even with
+its maximal possible conductance. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{ex3_2}
+    \caption{Simulation for beating mode}
+    \label{fig:beat}
+\end{figure}
+
+
 \subsection{Phase diagram}
+
+In this section we analyze different modes of neuronal behavior
+depending on the parameters  $\tilde{g}_{NaP} and I_{ext}$.
+In order to classify the mode we modified the function of the Exercise 3.1.
+After removal of transients in the beginning we classify as silence in
+the absence of bursts and as beating if the duration of a ``burst'' is more than 1.5$s$.
+The interval between spikes for bursting is computed as average of all the intervals.
+
+The results can be found on the figure \ref{fig:modes}. In case of bursting
+the frequency is the frequency of bursting sets (which is inverse of the period),
+for the beating it is the frequency of spikes. We explored the following intervals of
+parameters: $0 < I_{ext} < 80pA and 1.5nS < \tilde{g}_{NaP} < 3.5nS$, with
+the stimulus duration of 12$s$.
+
+The mode depends on both injected current and $NaP$ channel conductance.
+Starting from at least 70pA the neuron elicits beating no matter what the conductance is
+in the defined interval. The transition from silence to bursting occurs after 10pA
+for conductances lower than 2.5 and even earlier for the larger conductances.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{ex3_3}
+    \caption{Modes and frequencies for different injected current and conductances $\tilde{g}_{NaP}$}
+    \label{fig:modes}
+\end{figure}
+
 \end{document}

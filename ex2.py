@@ -18,7 +18,7 @@ rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 rc('text', usetex=False)
 
 def main():
-    tend=200
+    tend=500
     cur = 40
     start = 30
     dur = 20
@@ -28,18 +28,18 @@ def main():
         break
     #step=1
     #if step == 1:
-        for g in arange(g_thr_pre + step, g_thr + step, step):
-            g = float(g)
-            print g
-            reference_params['gNaP'] = g
-            tr = m.HH_Step(reference_params, Step_tstart = start, Duration = dur, I_amp=cur, tend=tend, model=m.HH_model_NaP)
-            spike_times = m.detect_spikes(tr['t']/ms, tr['v'][0]/mV, threshold=0)
-            if len(spike_times) > 5: #and spike_times[-1] > start + dur + 20:
-                g_thr = g
-                g_thr_pre = g - step
-                break
+        #for g in arange(g_thr_pre + step, g_thr + step, step):
+            #g = float(g)
+            #print g
+            #reference_params['gNaP'] = g
+            #tr = m.HH_Step(reference_params, Step_tstart = start, Duration = dur, I_amp=cur, tend=tend, model=m.HH_model_NaP)
+            #spike_times = m.detect_spikes(tr['t']/ms, tr['v'][0]/mV, threshold=0)
+            #if len(spike_times) > 10: #and spike_times[-1] > start + dur + 20:
+                #g_thr = g
+                #g_thr_pre = g - step
+                #break
 
-    g_thr = 3.0 #2.35 # GOOD THRESHOLD with precision of 0.01
+    g_thr = 2.35 # GOOD THRESHOLD with precision of 0.01
     print g_thr
     reference_params['gNaP'] = g_thr
     tr = m.HH_Step(reference_params, Step_tstart = start, Duration = dur, I_amp=cur, tend=tend, model=m.HH_model_NaP)
@@ -170,4 +170,4 @@ def main2():
     #close()
 
 #if __name__ == '__main__':
-main2()
+main()

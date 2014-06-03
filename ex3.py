@@ -102,10 +102,10 @@ def modes(time, vtrace):
     return (mode, bduration, bperiod)
 
 def main2():
-    tend=11000
+    tend=21000
     cur = 80
     start = 30
-    dur = 10000
+    dur = 20000
 
     tr = m.HH_Step(reference_params, Step_tstart = start, Duration = dur, I_amp=cur, tend=tend, model=m.HH_model_KS)
     mode, bduration, bperiod = modes(tr['t']/ms, tr['v'][0]/mV)
@@ -140,7 +140,7 @@ def main2():
     xlabel("Time, ms")
     title('Currents')
     legend()
-    savefig(image_dir + "ex3.2.pdf")
+    #savefig(image_dir + "ex3.2.pdf")
 
 def main3():
     tend=11000
@@ -196,9 +196,9 @@ def plot3():
     title('Frequencies, Hz')
     #cbar.set_clim([0,50])
 
-    savefig(image_dir + "ex3.3.pdf")
+    #savefig(image_dir + "ex3.3.pdf")
 
 
 #if __name__ == '__main__':
-plot3()
-#main2()
+#plot3()
+main2()
